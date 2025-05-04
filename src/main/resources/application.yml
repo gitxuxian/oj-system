@@ -89,14 +89,6 @@ wx:
   open:
     appId: xxx
     appSecret: xxx
-# 对象存储
-# todo 需替换配置
-cos:
-  client:
-    accessKey: xxx
-    secretKey: xxx
-    region: xxx
-    bucket: xxx
 # 接口文档配置
 knife4j:
   enable: true
@@ -132,4 +124,4 @@ aliyun:
     sign-name: OJ在线判题系统
     template-code: SMS_480200388  # 短信模板CODE
 codesandbox:
-  type: example
+  type: remote
