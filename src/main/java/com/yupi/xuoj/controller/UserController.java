@@ -3,6 +3,7 @@ package com.yupi.xuoj.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
+import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,12 +27,8 @@ import com.yupi.xuoj.service.UserService;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
-import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
-import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.DigestUtils;
@@ -39,7 +36,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.yupi.xuoj.service.impl.UserServiceImpl.SALT;
@@ -52,8 +48,6 @@ public class UserController {
 
     @Resource
     private UserService userService;
-
-    // region 登录相关
 
     /**
      * 用户注册
@@ -112,28 +106,27 @@ public class UserController {
     @SaCheckLogin
     public SaResult userLogout() {
         StpUtil.logout();
-        return SaResult.ok();
+        return SaResult.ok("注销成功");
     }
 
     /**
      * 获取当前登录用户
      *
-     * @param request
      * @return
      */
     @GetMapping("/get/login")
     @SaCheckLogin
-    public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
-        User user = userService.getLoginUser(request);
+    public BaseResponse<LoginUserVO> getLoginUser() {
+        if (StpUtil.isLogin()) {
+            SaResult.error("未登录，无法获取信息");
+        }
+        Object loginId = StpUtil.getLoginId();
+        User user = userService.getLoginUser(loginId);
         return ResultUtils.success(userService.getLoginUserVO(user));
     }
 
-    // endregion
-
-    // region 增删改查
-
     /**
-     * 创建用户
+     * 管理员创建用户
      *
      * @param userAddRequest
      * @param request
@@ -269,7 +262,6 @@ public class UserController {
         return ResultUtils.success(userVOPage);
     }
 
-    // endregion
 
     /**
      * 更新个人信息

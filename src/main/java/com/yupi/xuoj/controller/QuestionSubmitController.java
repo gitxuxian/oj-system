@@ -10,7 +10,6 @@ import com.yupi.xuoj.exception.BusinessException;
 import com.yupi.xuoj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.yupi.xuoj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.yupi.xuoj.model.entity.QuestionSubmit;
-import com.yupi.xuoj.model.entity.User;
 import com.yupi.xuoj.model.vo.QuestionSubmitVO;
 import com.yupi.xuoj.service.QuestionSubmitService;
 import com.yupi.xuoj.service.UserService;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,16 +37,14 @@ public class QuestionSubmitController {
     private UserService userService;
 
     /**
-     * 点赞 / 取消点赞
      *
-     * @param request
+     *
      * @return resultNum 本次点赞变化数
      */
     @PostMapping("/submit")
     @SaCheckLogin
     @ApiOperation("题目提交")
-    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
-                                               HttpServletRequest request) {
+    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest) {
         if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }

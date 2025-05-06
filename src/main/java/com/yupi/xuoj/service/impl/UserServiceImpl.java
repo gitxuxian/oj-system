@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,14 +71,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机格式错误");
         }
         // 密码和校验密码相同
-        if (!ReUtil.isMatch(ReConstant.PASSWORD_RE, userPassword) && !userPassword.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致或密码格式错误");
+        if (!ReUtil.isMatch(ReConstant.PASSWORD_RE, userPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码需8-20位且包含大小写字母");
+        }
+        if (!userPassword.equals(checkPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
         }
         String codeRedis = redisTemplate.opsForValue().get("sms_code:" + phone);
         if (!codeRedis.equals(code) || codeRedis.isEmpty()) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "验证码错误");
         }
-        //todo 需要实现分布式注册
         synchronized (phone.intern()) {
             // 账户不能重复
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -138,52 +139,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
-        // 3. 记录用户的登录态,分布式登录
-        //登录状态的存储
-        LoginUserVO loginUserVO = this.getLoginUserVO(user);
-        Map<String, String> userMap = new HashMap<>();
-        userMap.put("username", loginUserVO.getUserName());
-        userMap.put("email", loginUserVO.getEmail());
-        userMap.put("avatar", loginUserVO.getUserAvatar());
-        userMap.put("profile", loginUserVO.getUserProfile());
-        String token = UUID.randomUUID().toString();
-        String tokenKey = "user::info" + token;
 
-        stringRedisTemplate.opsForHash().putAll(tokenKey, userMap);
-        stringRedisTemplate.expire(tokenKey, 7, TimeUnit.DAYS);
         return this.getLoginUserVO(user);
-    }
-
-    @Override
-    public LoginUserVO userLoginByMpOpen(WxOAuth2UserInfo wxOAuth2UserInfo, HttpServletRequest request) {
-        String unionId = wxOAuth2UserInfo.getUnionId();
-        String mpOpenId = wxOAuth2UserInfo.getOpenid();
-        // 单机锁
-        synchronized (unionId.intern()) {
-            // 查询用户是否已存在
-            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("unionId", unionId);
-            User user = this.getOne(queryWrapper);
-            // 被封号，禁止登录
-            if (user != null && UserRoleEnum.BAN.getValue().equals(user.getUserRole())) {
-                throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "该用户已被封，禁止登录");
-            }
-            // 用户不存在则创建
-            if (user == null) {
-                user = new User();
-                user.setUnionId(unionId);
-                user.setMpOpenId(mpOpenId);
-                user.setUserAvatar(wxOAuth2UserInfo.getHeadImgUrl());
-                user.setUserName(wxOAuth2UserInfo.getNickname());
-                boolean result = this.save(user);
-                if (!result) {
-                    throw new BusinessException(ErrorCode.SYSTEM_ERROR, "登录失败");
-                }
-            }
-            // 记录用户的登录态
-            request.getSession().setAttribute(USER_LOGIN_STATE, user);
-            return getLoginUserVO(user);
-        }
     }
 
     /**
@@ -274,7 +231,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public User getLoginUser(HttpServletRequest request) {
-        return null;
+    public User getLoginUser(Object loginId) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", loginId);
+        User user = this.baseMapper.selectOne(queryWrapper);
+        // 用户不存在
+        if (user == null) {
+            log.info("user query failed");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        }
+        //状态的存储
+        LoginUserVO loginUserVO = this.getLoginUserVO(user);
+        Map<String, String> userMap = new HashMap<>();
+        userMap.put("username", loginUserVO.getUserName());
+        userMap.put("email", loginUserVO.getEmail());
+        userMap.put("avatar", loginUserVO.getUserAvatar());
+        userMap.put("profile", loginUserVO.getUserProfile());
+        String token = UUID.randomUUID().toString();
+        String tokenKey = "user::info" + token;
+        stringRedisTemplate.opsForHash().putAll(tokenKey, userMap);
+        stringRedisTemplate.expire(tokenKey, 7, TimeUnit.DAYS);
+        return user;
     }
 }

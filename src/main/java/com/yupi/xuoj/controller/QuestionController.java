@@ -1,6 +1,7 @@
 package com.yupi.xuoj.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
@@ -11,11 +12,11 @@ import com.yupi.xuoj.common.BaseResponse;
 import com.yupi.xuoj.common.DeleteRequest;
 import com.yupi.xuoj.common.ErrorCode;
 import com.yupi.xuoj.common.ResultUtils;
+import com.yupi.xuoj.constant.UserConstant;
 import com.yupi.xuoj.exception.BusinessException;
 import com.yupi.xuoj.exception.ThrowUtils;
 import com.yupi.xuoj.model.dto.question.*;
 import com.yupi.xuoj.model.entity.Question;
-import com.yupi.xuoj.model.entity.User;
 import com.yupi.xuoj.model.vo.QuestionVO;
 import com.yupi.xuoj.service.QuestionService;
 import com.yupi.xuoj.service.UserService;
@@ -43,7 +44,7 @@ public class QuestionController {
     private UserService userService;
 
     private final static Gson GSON = new Gson();
-    // region 增删改查
+
 
     /**
      * 创建
@@ -55,6 +56,7 @@ public class QuestionController {
     @SaCheckLogin
     @PostMapping("/add")
     @ApiOperation("添加题目")
+    @SaCheckPermission(orRole = {"amdin", "problem_creator"})
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
         if (questionAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -93,6 +95,7 @@ public class QuestionController {
     @PostMapping("/delete")
     @SaCheckLogin
     @ApiOperation("删除题目")
+    @SaCheckRole("admin")
     public BaseResponse<Boolean> deleteQuestion(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -101,11 +104,6 @@ public class QuestionController {
         // 判断是否存在
         Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可删除
-        //TODO 改为创建者可以删除，但是需要管理员审核
-        if (!oldQuestion.getUserId().equals(StpUtil.getLoginIdAsLong()) && !userService.isAdmin(request)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
         boolean b = questionService.removeById(id);
         return ResultUtils.success(b);
     }
@@ -117,7 +115,7 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/update")
-    @SaCheckRole("admin")
+    @SaCheckPermission(orRole = {"amdin", "problem_creator"})
     @ApiOperation("更新题目")
     public BaseResponse<Boolean> updateQuestion(@RequestBody QuestionUpdateRequest questionUpdateRequest) {
         if (questionUpdateRequest == null || questionUpdateRequest.getId() <= 0) {
@@ -142,6 +140,9 @@ public class QuestionController {
         long id = questionUpdateRequest.getId();
         // 判断是否存在
         Question oldQuestion = questionService.getById(id);
+        if (!(oldQuestion.getUserId() == StpUtil.getLoginIdAsLong()) && !StpUtil.hasRole(UserConstant.ADMIN_ROLE)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
         ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
         boolean result = questionService.updateById(question);
         return ResultUtils.success(result);
@@ -168,7 +169,7 @@ public class QuestionController {
     }
 
     /**
-     * 分页获取列表（仅管理员）
+     * 分页获取列表
      *
      * @param questionQueryRequest
      * @return
@@ -239,6 +240,7 @@ public class QuestionController {
     @PostMapping("/edit")
     @ApiOperation("编辑题目")
     @SaCheckLogin
+    @SaCheckPermission(orRole = {"amdin", "problem_creator"})
     public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest, HttpServletRequest request) {
         if (questionEditRequest == null || questionEditRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -259,18 +261,14 @@ public class QuestionController {
         }
         // 参数校验
         questionService.validQuestion(question, false);
-
         long id = questionEditRequest.getId();
         // 判断是否存在
         Question oldQuestion = questionService.getById(id);
-        ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可编辑
-        //TODO 改为本人编辑题目需要管理员审核
-        if (!oldQuestion.getUserId().equals(StpUtil.getLoginIdAsLong()) && !StpUtil.hasRole("admin")) {
+        if (!(oldQuestion.getUserId() == StpUtil.getLoginIdAsLong()) && !StpUtil.hasRole(UserConstant.ADMIN_ROLE)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
+        ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
         boolean result = questionService.updateById(question);
         return ResultUtils.success(result);
     }
-
 }

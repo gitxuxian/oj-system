@@ -33,4 +33,9 @@ public class ExecuteCodeResponse {
      * 接口信息
      */
     private String message;
+
+    /**
+     * 判题信息
+     */
+    private List<JudgeInfo> judgeInfoList;
 }

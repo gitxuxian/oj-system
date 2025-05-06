@@ -49,16 +49,16 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
+        <!-- Sa-Token插件：权限缓存与业务缓存分离 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-alone-redis</artifactId>
+            <version>1.40.0</version>
+        </dependency>
         <!-- elasticsearch-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.github.binarywang/wx-java-mp-spring-boot-starter -->
-        <dependency>
-            <groupId>com.github.binarywang</groupId>
-            <artifactId>wx-java-mp-spring-boot-starter</artifactId>
-            <version>4.4.0</version>
         </dependency>
         <!-- https://doc.xiaominfo.com/docs/quick-start#openapi2 -->
         <dependency>
@@ -133,6 +133,11 @@
             <version>1.40.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-sso</artifactId>
+            <version>1.40.0</version>
+        </dependency>
 
         <!-- 短信SDK（示例使用阿里云） -->
         <dependency>

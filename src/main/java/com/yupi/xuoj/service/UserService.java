@@ -10,7 +10,6 @@ import com.yupi.xuoj.model.vo.UserVO;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
 
 public interface UserService extends IService<User> {
@@ -34,15 +33,6 @@ public interface UserService extends IService<User> {
      * @return
      */
     LoginUserVO userLogin(String phone, String email, String userPassword);
-
-    /**
-     * 用户登录（微信开放平台）
-     *
-     * @param wxOAuth2UserInfo 从微信获取的用户信息
-     * @param request
-     * @return 脱敏后的用户信息
-     */
-    LoginUserVO userLoginByMpOpen(WxOAuth2UserInfo wxOAuth2UserInfo, HttpServletRequest request);
 
 
     /**
@@ -100,5 +90,5 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
-    User getLoginUser(HttpServletRequest request);
+    User getLoginUser(Object loginID);
 }
