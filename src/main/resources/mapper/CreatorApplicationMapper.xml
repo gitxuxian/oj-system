@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yupi.xuoj.mapper.CreatorApplicationMapper">
+
+    <resultMap id="BaseResultMap" type="com.yupi.xuoj.model.entity.CreatorApplication">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="user_id" column="user_id" jdbcType="BIGINT"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="reason" column="reason" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="create_time" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="judge_time" column="judge_time" jdbcType="TIMESTAMP"/>
+        <result property="judge_user_id" column="judge_user_id" jdbcType="BIGINT"/>
+        <result property="judge_username" column="judge_username" jdbcType="VARCHAR"/>
+        <result property="judge_comment" column="judge_comment" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,user_id,username,
+        reason,status,create_time,
+        judge_time,judge_user_id,judge_username,
+        judge_comment
+    </sql>
+</mapper>
