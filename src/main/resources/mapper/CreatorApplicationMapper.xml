@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yupi.xuoj.mapper.CreatorApplicationMapper">
+<mapper namespace="com.xu.xuoj.mapper.CreatorApplicationMapper">
 
-    <resultMap id="BaseResultMap" type="com.yupi.xuoj.model.entity.CreatorApplication">
+    <resultMap id="BaseResultMap" type="com.xu.xuoj.model.entity.CreatorApplication">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="user_id" column="user_id" jdbcType="BIGINT"/>
         <result property="username" column="username" jdbcType="VARCHAR"/>
