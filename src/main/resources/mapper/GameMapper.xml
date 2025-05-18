@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xu.xuoj.mapper.GameMapper">
+
+    <resultMap id="BaseResultMap" type="com.xu.xuoj.model.entity.Game">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="gameName" column="gameName" jdbcType="VARCHAR"/>
+        <result property="gameDate" column="gameDate" jdbcType="TIMESTAMP"/>
+        <result property="durationMinutes" column="durationMinutes" jdbcType="INTEGER"/>
+        <result property="rules" column="rules" jdbcType="VARCHAR"/>
+        <result property="awards" column="awards" jdbcType="VARCHAR"/>
+        <result property="creatorUserId" column="creatorUserId" jdbcType="BIGINT"/>
+        <result property="type" column="type" jdbcType="TINYINT"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,gameName,gameDate,
+        durationMinutes,rules,awards,
+        creatorUserId,type,status,
+        password,description,createTime,
+        updateTime,isDelete
+    </sql>
+</mapper>

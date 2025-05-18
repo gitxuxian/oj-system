@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xu.xuoj.mapper.GameQuestionMapper">
+
+    <resultMap id="BaseResultMap" type="com.xu.xuoj.model.entity.GameQuestion">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="gameId" column="gameId" jdbcType="BIGINT"/>
+        <result property="questionId" column="questionId" jdbcType="BIGINT"/>
+        <result property="displayOrder" column="displayOrder" jdbcType="INTEGER"/>
+        <result property="score" column="score" jdbcType="INTEGER"/>
+        <result property="titleAlias" column="titleAlias" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,gameId,questionId,
+        displayOrder,score,titleAlias,
+        createTime,updateTime
+    </sql>
+</mapper>
