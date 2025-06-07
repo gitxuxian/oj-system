@@ -6,8 +6,6 @@ import com.xu.xuoj.mapper.UserGameMapper;
 import com.xu.xuoj.model.entity.UserGame;
 import com.xu.xuoj.service.UserGameService;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 import java.util.Date;
 
 @Service

@@ -21,7 +21,27 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue gameCodeQueue() {
+        return new Queue("gameCodeQueue", true);
+    }
+
+    @Bean
     public Binding codeBinding(Queue codeQueue, DirectExchange codeExchange) {
         return BindingBuilder.bind(codeQueue).to(codeExchange).with("my_routingKey");
+    }
+
+    @Bean
+    public DirectExchange gameExchange() {
+        return new DirectExchange("game_exchange", true, false);
+    }
+
+    @Bean
+    Queue gameQueue() {
+        return new Queue("game_queue", true);
+    }
+
+    @Bean
+    public Binding gameBindding(Queue gameQueue, DirectExchange gameExchange) {
+        return BindingBuilder.bind(gameQueue).to(gameExchange).with("game_routingKey");
     }
 }

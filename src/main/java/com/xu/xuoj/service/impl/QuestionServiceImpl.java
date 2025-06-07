@@ -66,7 +66,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         if (StringUtils.isNotBlank(judgeConfig) && judgeConfig.length() > 8192) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "判题配置过长");
         }
-
     }
 
     /**

@@ -32,10 +32,13 @@ public class JudgeMessageConsumer {
     public void receiveMessage(String message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
         // 使用日志记录器打印接收到的消息内容
         log.info("receiveMessage message = {}", message);
-        long questionSubmitId = Long.parseLong(message);
+        String[] s = message.split(" ");
+
+        long questionSubmitId = Long.parseLong(s[0]);
+        long gameId = Long.parseLong(s[1]);
         try {
             // 手动确认消息的接收，向RabbitMQ发送确认消息
-            judgeService.doJudge(questionSubmitId);
+            judgeService.doJudge(questionSubmitId, gameId);
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             channel.basicNack(deliveryTag, false, false);

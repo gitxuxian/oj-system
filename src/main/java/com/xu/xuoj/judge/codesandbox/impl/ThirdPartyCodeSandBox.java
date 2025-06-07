@@ -33,7 +33,6 @@ public class ThirdPartyCodeSandBox {
         for (String input : executeCodeRequest.getInputList()) {
             SortedMap<Object, Object> sortedMap = new TreeMap<Object, Object>() {
                 private static final long serialVersionUID = 1L;
-
                 {
                     put("source_code", executeCodeRequest.getCode());
                     put("language_id", QuestionSubmitLanguageEnum.getEnumByValue(language).getId());

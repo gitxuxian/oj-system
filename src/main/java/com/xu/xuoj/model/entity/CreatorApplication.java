@@ -18,6 +18,7 @@ import lombok.Data;
 @Builder
 @Data
 public class CreatorApplication {
+
     /**
      * 主键
      */

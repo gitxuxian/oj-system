@@ -7,10 +7,12 @@ import com.xu.xuoj.common.ErrorCode;
 import com.xu.xuoj.common.ResultUtils;
 import com.xu.xuoj.exception.BusinessException;
 import com.xu.xuoj.model.dto.game.GameQueryDTO;
+import com.xu.xuoj.model.dto.game.GameQuestionAddRequest;
 import com.xu.xuoj.model.dto.game.GameQuestionDTO;
 import com.xu.xuoj.model.entity.Question;
 import com.xu.xuoj.model.vo.QuestionVO;
 import com.xu.xuoj.service.GameQuestionService;
+import com.xu.xuoj.service.GameService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -19,6 +21,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/game/question")
 public class GameQuestionController {
+
+    @Resource
+    private GameService gameService;
 
     @Resource
     private GameQuestionService gameQuestionService;
@@ -54,4 +59,13 @@ public class GameQuestionController {
         }
         return ResultUtils.success(gameQuestions);
     }
+
+    @PostMapping("/game_submit")
+    public BaseResponse<Long> questionSubmit(@RequestBody GameQuestionAddRequest gameQuestionAddRequest) {
+        if (gameQuestionAddRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+    }
+
 }

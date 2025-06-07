@@ -1,5 +1,6 @@
 package com.xu.xuoj.judge;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xu.xuoj.common.ErrorCode;
@@ -10,15 +11,18 @@ import com.xu.xuoj.judge.codesandbox.impl.ThirdPartyCodeSandBox;
 import com.xu.xuoj.judge.codesandbox.model.ExecuteCodeRequest;
 import com.xu.xuoj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.xu.xuoj.judge.codesandbox.model.SubmissionResult;
+import com.xu.xuoj.judge.rambbitmq.GameMessageProducer;
 import com.xu.xuoj.judge.strategy.JudgeContext;
 import com.xu.xuoj.model.dto.question.JudgeCase;
 import com.xu.xuoj.judge.codesandbox.model.JudgeInfo;
+import com.xu.xuoj.model.entity.GameSubmissionMessage;
 import com.xu.xuoj.model.entity.Question;
 import com.xu.xuoj.model.entity.QuestionSubmit;
 import com.xu.xuoj.model.enums.JudgeInfoMessageEnum;
 import com.xu.xuoj.model.enums.QuestionSubmitStatusEnum;
 import com.xu.xuoj.service.QuestionService;
 import com.xu.xuoj.service.QuestionSubmitService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class JudgeServiceImpl implements JudgeService {
 
 
@@ -45,8 +50,11 @@ public class JudgeServiceImpl implements JudgeService {
     @Resource
     private ThirdPartyCodeSandBox thirdPartyCodeSandBox;
 
+    @Resource
+    private GameMessageProducer gameMessageProducer;
+
     @Override
-    public QuestionSubmit doJudge(long questionSubmitId) {
+    public QuestionSubmit doJudge(long questionSubmitId, long gameId) {
         // 1）传入题目的提交 id，获取到对应的题目、提交信息（包含代码、编程语言等）
         QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
         if (questionSubmit == null) {
@@ -118,9 +126,18 @@ public class JudgeServiceImpl implements JudgeService {
             .set(QuestionSubmit::getJudgeInfo, JSONUtil.toJsonStr(judgeInfo));
         boolean updated = questionSubmitService.update(questionSubmitUpdateWrapper); // 注意：这里传递的是wrapper
         if (!updated) {
-            // 可以考虑检查 updated 返回值，如果影响行数为0也可能意味着更新失败（虽然id存在）
-            // 但通常 service.update(wrapper) 在没有匹配行时也会返回 false (或 0 for int return type)
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "更新提交记录失败或记录不存在");
+        }
+        if (gameId != 0) {
+            GameSubmissionMessage rankUpdateMessage = new GameSubmissionMessage(
+                questionSubmitId,
+                gameId,
+                StpUtil.getLoginIdAsLong(),
+                StpUtil.getTokenName()
+            );
+            gameMessageProducer.sendMessage("game_routingKey", "game_exchange", rankUpdateMessage.toString());
+        } else {
+            log.error("判题服务：更新提交记录失败 for submissionId: {}", questionSubmit);
         }
         // 获取更新后的提交记录，应使用 questionSubmitId
         return questionSubmitService.getById(questionSubmitId);

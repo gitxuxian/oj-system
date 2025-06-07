@@ -30,13 +30,15 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-
+resources/application.yml
+resources/application-prod.yml
+resources/application-test.yml
 ### VS Code ###
 .vscode/
 ### Java template
 # Compiled class file
 *.class
-
+test/
 # Log file
 *.log
 

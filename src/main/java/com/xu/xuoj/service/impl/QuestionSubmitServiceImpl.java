@@ -75,7 +75,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         Integer submitNum = question.getSubmitNum();
         questionUpdateWrapper.lambda().set(Question::getSubmitNum, ++submitNum);
         questionService.update(questionUpdateWrapper);
-
         judgeMessageProducer.sendMessage("my_routingKey", "code_exchange", questionSubmit.getId().toString());
         return questionSubmit.getId();
     }
@@ -117,6 +116,31 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             .collect(Collectors.toList());
         questionSubmitVOPage.setRecords(questionSubmitVOList);
         return questionSubmitVOPage;
+    }
+
+    @Override
+    public Long initiateSubmissionAndSendToJudgeQueue(QuestionSubmitAddRequest questionSubmitAddRequest, Long currentUserId, Long gameId) {
+        QuestionSubmit questionSubmit = new QuestionSubmit();
+        questionSubmit.setUserId(currentUserId);
+        questionSubmit.setQuestionId(questionSubmitAddRequest.getQuestionId());
+        questionSubmit.setLanguage(questionSubmitAddRequest.getLanguage());
+        questionSubmit.setCode(questionSubmitAddRequest.getCode());
+        questionSubmit.setJudgeInfo("{}"); // 初始为空的 JSON 对象
+        questionSubmit.setStatus(QuestionSubmitStatusEnum.IN_QUEUE.getValue()); // 假设你有这个枚举
+        boolean save = this.save(questionSubmit);// 保存到数据库，MyBatis Plus 会自动填充 ID
+        if (!save) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "保存失败");
+        }
+        Long submitId = questionSubmit.getId();
+        String message = submitId.toString() + " " + gameId.toString();
+        try {
+            judgeMessageProducer.sendMessage("my_routingKey", "code_exchange", message);
+        } catch (Exception e) {
+            // 日志记录，并可能需要抛出异常以回滚数据库操作
+            log.error("发送判题请求到队列失败 for submissionId: {}");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "发送判题请求失败");
+        }
+        return submitId;
     }
 
 
