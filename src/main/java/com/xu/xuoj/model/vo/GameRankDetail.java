@@ -1,18 +1,18 @@
-package com.xu.xuoj.model.entity;
+package com.xu.xuoj.model.vo;
 
+import com.xu.xuoj.model.entity.GameDetailUnit;
 import lombok.Data;
-
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * @version 1.0
- * @Author ZZX
- * @Date 2024/1/10 16:06
+ * 比赛排行榜详情VO
+ * @author xu
  */
 @Data
 public class GameRankDetail implements Serializable {
+    
     /**
      * 名次
      */
@@ -34,12 +34,12 @@ public class GameRankDetail implements Serializable {
     private Integer totalScore;
 
     /**
-     * 总耗时
+     * 总耗时（ms）
      */
     private Integer totalTime;
 
     /**
-     * 总耗用内存
+     * 总耗用内存（kb）
      */
     private Integer totalMemory;
 
@@ -49,4 +49,4 @@ public class GameRankDetail implements Serializable {
     private List<GameDetailUnit> questionDetails;
 
     private static final long serialVersionUID = 1L;
-}
+} 

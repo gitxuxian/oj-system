@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * @version 1.0
- * @Author xu
- * @Date 2024/1/10 10:47
+ * 比赛详情单元实体类
+ * @author xu
  */
 @Data
 @AllArgsConstructor
@@ -32,23 +31,28 @@ public class GameDetailUnit implements Serializable
     private Integer score;
 
     /**
-     * 单题耗时
+     * 单题耗时（ms）
      */
     private Integer timeCost;
 
     /**
-     * 单题耗内存
+     * 单题耗内存（kb）
      */
     private Integer memoryCost;
 
     /**
      * 比较是否比另一个好
-     *
-     * @param other
-     * @return
+     * 判断标准：分数->耗时->内存
+     * @param other 另一个答题结果
+     * @return 是否更好
      */
     public boolean isBetter(GameDetailUnit other)
     {
+        if (other == null)
+        {
+            return true;
+        }
+        
         // 首先比较分数是否更大
         if (this.score > other.getScore())
         {
@@ -58,7 +62,8 @@ public class GameDetailUnit implements Serializable
         {
             return false;
         }
-        // 其次比较耗时是否更少
+        
+        // 分数相同，比较耗时是否更少
         if (this.timeCost < other.getTimeCost())
         {
             return true;
@@ -67,12 +72,9 @@ public class GameDetailUnit implements Serializable
         {
             return false;
         }
-        // 最后比较耗费空间是否更少
-        if (this.memoryCost < other.getMemoryCost())
-        {
-            return true;
-        }
-        return false;
+        
+        // 耗时相同，比较耗费空间是否更少
+        return this.memoryCost < other.getMemoryCost();
     }
 
     private static final long serialVersionUID = 1L;

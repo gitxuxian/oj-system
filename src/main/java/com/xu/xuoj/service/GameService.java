@@ -17,4 +17,24 @@ public interface GameService extends IService<Game> {
     List<Game> listGames(GameQueryDTO gameQueryDTO);
 
     Long questionSubmit(GameQuestionAddRequest gameQuestionSubmitRequest);
+    
+    /**
+     * 检查比赛状态
+     * @param gameId 比赛ID
+     * @return 是否可以查看排行榜
+     */
+    boolean canViewRankings(Long gameId);
+    
+    /**
+     * 检查比赛是否进行中
+     * @param gameId 比赛ID
+     * @return 是否进行中
+     */
+    boolean isGameRunning(Long gameId);
+    
+    /**
+     * 更新比赛状态
+     * @param gameId 比赛ID
+     */
+    void updateGameStatus(Long gameId);
 }

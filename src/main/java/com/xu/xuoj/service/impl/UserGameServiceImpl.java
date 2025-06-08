@@ -7,6 +7,7 @@ import com.xu.xuoj.model.entity.UserGame;
 import com.xu.xuoj.service.UserGameService;
 import org.springframework.stereotype.Service;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserGameServiceImpl extends ServiceImpl<UserGameMapper, UserGame>
@@ -15,10 +16,7 @@ public class UserGameServiceImpl extends ServiceImpl<UserGameMapper, UserGame>
     @Override
     public boolean joinGame(Long userId, Long gameId) {
         // 检查是否已报名
-        UserGame exist = this.getOne(new QueryWrapper<UserGame>()
-            .eq("userId", userId)
-            .eq("gameId", gameId));
-        if (exist != null) {
+        if (hasJoinedGame(userId, gameId)) {
             throw new RuntimeException("您已报名该竞赛");
         }
 
@@ -46,5 +44,36 @@ public class UserGameServiceImpl extends ServiceImpl<UserGameMapper, UserGame>
         return this.update(userGame, new QueryWrapper<UserGame>()
             .eq("userId", userId)
             .eq("gameId", gameId));
+    }
+
+    @Override
+    public List<UserGame> getUserGames(Long userId) {
+        QueryWrapper<UserGame> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", userId)
+                   .orderByDesc("registrationTime");
+        return this.list(queryWrapper);
+    }
+
+    @Override
+    public List<UserGame> getGameParticipants(Long gameId) {
+        QueryWrapper<UserGame> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("gameId", gameId)
+                   .orderByAsc("registrationTime");
+        return this.list(queryWrapper);
+    }
+
+    @Override
+    public boolean hasJoinedGame(Long userId, Long gameId) {
+        UserGame exist = this.getOne(new QueryWrapper<UserGame>()
+            .eq("userId", userId)
+            .eq("gameId", gameId));
+        return exist != null;
+    }
+
+    @Override
+    public boolean quitGame(Long userId, Long gameId) {
+        QueryWrapper<UserGame> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", userId).eq("gameId", gameId);
+        return this.remove(queryWrapper);
     }
 }

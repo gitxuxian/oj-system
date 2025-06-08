@@ -13,6 +13,8 @@ import com.xu.xuoj.model.dto.game.GameUpdateDTO;
 import com.xu.xuoj.model.entity.Game;
 import com.xu.xuoj.model.vo.GameVO;
 import com.xu.xuoj.service.GameService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/game")
+@Api(tags = "竞赛模块")
+
 public class GameController {
 
 
@@ -31,6 +35,7 @@ public class GameController {
 
     @PostMapping("/add")
     @SaCheckRole("admin")
+    @ApiOperation("添加竞赛")
     public BaseResponse<Long> addGame(@RequestBody @Valid GameAddDTO gameAddDTO) {
         Game game = new Game();
         BeanUtils.copyProperties(gameAddDTO, game);
@@ -44,6 +49,7 @@ public class GameController {
 
     @PostMapping("/delete")
     @SaCheckRole("admin")
+    @ApiOperation("删除竞赛")
     public BaseResponse<Boolean> deleteGame(@RequestParam Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("比赛id不合法");
@@ -54,6 +60,7 @@ public class GameController {
 
     @PostMapping("/update")
     @SaCheckRole("admin")
+    @ApiOperation("更新竞赛")
     public BaseResponse<Boolean> updateGame(@RequestBody @Valid GameUpdateDTO gameUpdateDTO) {
         Game game = new Game();
         BeanUtils.copyProperties(gameUpdateDTO, game);
@@ -66,6 +73,7 @@ public class GameController {
 
     @GetMapping("/get")
     @SaCheckLogin
+    @ApiOperation("根据id获取竞赛")
     public BaseResponse<GameVO> getGameById(@RequestParam Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("比赛id不合法");
@@ -81,6 +89,7 @@ public class GameController {
 
     @PostMapping("/list")
     @SaCheckLogin
+    @ApiOperation("获取竞赛列表")
     public BaseResponse<List<GameVO>> listGames(@RequestBody GameQueryDTO gameQueryDTO) {
         List<Game> games = gameService.listGames(gameQueryDTO);
         if (games.isEmpty()) {
@@ -96,6 +105,7 @@ public class GameController {
 
     @PostMapping("/updateStatus")
     @SaCheckRole("admin")
+    @ApiOperation("更新竞赛状态")
     public BaseResponse<Boolean> updateGameStatus(
         @RequestParam Long id,
         @RequestParam Integer status) {

@@ -6,9 +6,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * @version 1.0
- * @Author xu
- * @Date 2024/1/10 16:01
+ * 比赛详情实体类
+ * @author xu
  */
 @Data
 public class GameDetail implements Serializable

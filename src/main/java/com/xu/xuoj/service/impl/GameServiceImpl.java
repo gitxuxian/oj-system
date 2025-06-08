@@ -21,6 +21,7 @@ import com.xu.xuoj.model.enums.JudgeInfoMessageEnum;
 import com.xu.xuoj.service.GameService;
 
 import com.xu.xuoj.service.QuestionSubmitService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
  * @createDate 2025-05-17 14:51:46
  */
 @Service
+@Slf4j
 public class GameServiceImpl extends ServiceImpl<GameMapper, Game>
     implements GameService {
 
@@ -129,6 +131,79 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game>
             gameId
         );
         return submitId;
+    }
+
+    @Override
+    public boolean canViewRankings(Long gameId) {
+        Game game = this.getById(gameId);
+        if (game == null) {
+            return false;
+        }
+        
+        Date currentDate = new Date();
+        Date gameStartDate = game.getGameDate();
+        
+        // 只有比赛开始后才能查看排行榜
+        return !gameStartDate.after(currentDate);
+    }
+
+    @Override
+    public boolean isGameRunning(Long gameId) {
+        Game game = this.getById(gameId);
+        if (game == null) {
+            return false;
+        }
+        
+        Date currentDate = new Date();
+        Date gameStartDate = game.getGameDate();
+        Integer durationMinutes = game.getDurationMinutes();
+        
+        if (durationMinutes == null || durationMinutes <= 0) {
+            return false;
+        }
+        
+        Date gameEndDate = new Date(gameStartDate.getTime() + durationMinutes * 60 * 1000L);
+        
+        // 比赛进行中：当前时间在开始时间之后且在结束时间之前
+        return !gameStartDate.after(currentDate) && currentDate.before(gameEndDate);
+    }
+
+    @Override
+    public void updateGameStatus(Long gameId) {
+        Game game = this.getById(gameId);
+        if (game == null) {
+            return;
+        }
+        
+        Date currentDate = new Date();
+        Date gameStartDate = game.getGameDate();
+        Integer durationMinutes = game.getDurationMinutes();
+        
+        if (durationMinutes == null || durationMinutes <= 0) {
+            return;
+        }
+        
+        Date gameEndDate = new Date(gameStartDate.getTime() + durationMinutes * 60 * 1000L);
+        
+        Integer newStatus;
+        if (gameStartDate.after(currentDate)) {
+            // 未开始
+            newStatus = 0;
+        } else if (currentDate.before(gameEndDate)) {
+            // 进行中
+            newStatus = 1;
+        } else {
+            // 已结束
+            newStatus = 2;
+        }
+        
+        // 如果状态发生变化，则更新
+        if (!newStatus.equals(game.getStatus())) {
+            game.setStatus(newStatus);
+            game.setUpdateTime(currentDate);
+            this.updateById(game);
+            log.info("比赛状态已更新, gameId: {}, newStatus: {}", gameId, newStatus);
+        }
     }
 
 }

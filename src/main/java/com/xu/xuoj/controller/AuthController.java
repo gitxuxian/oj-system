@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/auth")
-@Api("邮箱验证码")
+@Api(tags = "邮箱验证")
 public class AuthController {
 
 

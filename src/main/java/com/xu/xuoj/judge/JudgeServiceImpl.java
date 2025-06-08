@@ -20,6 +20,7 @@ import com.xu.xuoj.model.entity.Question;
 import com.xu.xuoj.model.entity.QuestionSubmit;
 import com.xu.xuoj.model.enums.JudgeInfoMessageEnum;
 import com.xu.xuoj.model.enums.QuestionSubmitStatusEnum;
+import com.xu.xuoj.service.GameRankService;
 import com.xu.xuoj.service.QuestionService;
 import com.xu.xuoj.service.QuestionSubmitService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.sql.Wrapper;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +54,9 @@ public class JudgeServiceImpl implements JudgeService {
 
     @Resource
     private GameMessageProducer gameMessageProducer;
+
+    @Resource
+    private GameRankService gameRankService;
 
     @Override
     public QuestionSubmit doJudge(long questionSubmitId, long gameId) {
@@ -129,6 +134,9 @@ public class JudgeServiceImpl implements JudgeService {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "更新提交记录失败或记录不存在");
         }
         if (gameId != 0) {
+            // 如果是比赛提交，更新排行榜
+            updateGameRank(gameId, questionSubmit.getUserId(), judgeInfo, question);
+            
             GameSubmissionMessage rankUpdateMessage = new GameSubmissionMessage(
                 questionSubmitId,
                 gameId,
@@ -136,10 +144,35 @@ public class JudgeServiceImpl implements JudgeService {
                 StpUtil.getTokenName()
             );
             gameMessageProducer.sendMessage("game_routingKey", "game_exchange", rankUpdateMessage.toString());
-        } else {
-            log.error("判题服务：更新提交记录失败 for submissionId: {}", questionSubmit);
         }
         // 获取更新后的提交记录，应使用 questionSubmitId
         return questionSubmitService.getById(questionSubmitId);
+    }
+
+    /**
+     * 更新比赛排行榜
+     */
+    private void updateGameRank(Long gameId, Long userId, JudgeInfo judgeInfo, Question question) {
+        try {
+            // 计算得分（AC=100分，其他=0分，可以根据题目配置调整）
+            Integer score = 100; // 默认满分
+            
+            // 获取时间和内存消耗
+            Integer time = judgeInfo.getTime() != null ? judgeInfo.getTime().intValue() : 0;
+            Integer memory = judgeInfo.getMemory() != null ? judgeInfo.getMemory().intValue() : 0;
+            
+            // 使用新的最优提交更新方法
+            gameRankService.updateOptimalSubmission(
+                gameId, 
+                userId, 
+                question.getId(), 
+                score, 
+                time, 
+                memory, 
+                judgeInfo.getMessage()
+            );
+        } catch (Exception e) {
+            log.error("更新比赛排行榜失败, gameId: {}, userId: {}", gameId, userId, e);
+        }
     }
 }

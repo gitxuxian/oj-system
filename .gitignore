@@ -5,7 +5,9 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+resources/application.yml
+resources/application-prod.yml
+resources/application-test.yml
 ### STS ###
 .apt_generated
 .classpath
@@ -30,9 +32,7 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-resources/application.yml
-resources/application-prod.yml
-resources/application-test.yml
+
 ### VS Code ###
 .vscode/
 ### Java template

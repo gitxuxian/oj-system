@@ -13,6 +13,8 @@ import com.xu.xuoj.model.entity.Question;
 import com.xu.xuoj.model.vo.QuestionVO;
 import com.xu.xuoj.service.GameQuestionService;
 import com.xu.xuoj.service.GameService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/game/question")
+@Api(tags = "竞赛题目模块")
 public class GameQuestionController {
 
     @Resource
@@ -30,6 +33,7 @@ public class GameQuestionController {
 
     @PostMapping("/add")
     @SaCheckRole("admin")
+    @ApiOperation("添加竞赛题目")
     public BaseResponse<Boolean> addQuestionToGame(@RequestBody GameQuestionDTO gameQuestionDTO) {
         boolean result = gameQuestionService.addQuestionToGame(gameQuestionDTO);
         if (!result) {
@@ -40,6 +44,7 @@ public class GameQuestionController {
 
     @PostMapping("/remove")
     @SaCheckRole("admin")
+    @ApiOperation("移除竞赛题目")
     public BaseResponse<Boolean> removeQuestionFromGame(
         @RequestParam Long gameId,
         @RequestParam Long questionId) {
@@ -52,6 +57,7 @@ public class GameQuestionController {
 
     @GetMapping("/list")
     @SaCheckLogin
+    @ApiOperation("查询竞赛题目")
     public BaseResponse<List<QuestionVO>> getGameQuestions(@RequestParam Long gameId) {
         List<QuestionVO> gameQuestions = gameQuestionService.getGameQuestions(gameId);
         if (gameQuestions.isEmpty()) {
@@ -61,10 +67,12 @@ public class GameQuestionController {
     }
 
     @PostMapping("/game_submit")
+    @ApiOperation("竞赛提交")
     public BaseResponse<Long> questionSubmit(@RequestBody GameQuestionAddRequest gameQuestionAddRequest) {
         if (gameQuestionAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        return null;
 
     }
 
