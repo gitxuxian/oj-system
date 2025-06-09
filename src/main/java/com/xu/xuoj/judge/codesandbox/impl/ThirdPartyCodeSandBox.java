@@ -27,7 +27,7 @@ public class ThirdPartyCodeSandBox {
 
     public List<SubmissionResult> excuteCode(ExecuteCodeRequest executeCodeRequest) {
         System.out.println("远程代码沙箱");
-        String url = "http://115.190.45.182:2358/submissions/?base64_encoded=false&wait=true";
+        String url = "";
         String language = executeCodeRequest.getLanguage();
         List<SubmissionResult> submissionResults = new ArrayList<>();
         for (String input : executeCodeRequest.getInputList()) {
