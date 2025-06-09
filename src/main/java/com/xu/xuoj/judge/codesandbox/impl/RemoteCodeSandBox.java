@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 public class RemoteCodeSandBox implements CodeSandBox {
 
     private static final String AUTH_REQUEST_HEADER = "auth";
-    private static final String AUTH_REQUEST_SECRET = "b23813da7f066be253e3bdfa41f87e010b585ff970ff54e428fdcc34b0ad1e50";
+    private static final String AUTH_REQUEST_SECRET = "";
 
     @Override
     public ExecuteCodeResponse excuteCode(ExecuteCodeRequest executeCodeRequest) {
         System.out.println("远程代码沙箱");
-        String url = "http://115.190.45.182:8089/api/executeCode";
+        String url = "";
         String json = JSONUtil.toJsonStr(executeCodeRequest);
         String responseStr = HttpUtil.createPost(url)
             .header(AUTH_REQUEST_HEADER, AUTH_REQUEST_SECRET)
