@@ -73,7 +73,6 @@ public class GameQuestionController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         return null;
-
     }
 
 }

@@ -183,7 +183,6 @@ public class GameMessageConsumer {
         } else {
             gameDetailUnit.setScore(0);
         }
-        // gameDetailUnit.setStatus(judgeInfoMessage); // 可以添加一个状态字段
         return gameDetailUnit;
     }
 }

@@ -33,9 +33,13 @@ public class JudgeMessageConsumer {
         // 使用日志记录器打印接收到的消息内容
         log.info("receiveMessage message = {}", message);
         String[] s = message.split(" ");
-
-        long questionSubmitId = Long.parseLong(s[0]);
-        long gameId = Long.parseLong(s[1]);
+        long questionSubmitId = 0;
+        long gameId = 0;
+        if  (s.length == 1) {
+          questionSubmitId = Long.parseLong(s[0]);
+        }else {
+            gameId = Long.parseLong(s[1]);
+        }
         try {
             // 手动确认消息的接收，向RabbitMQ发送确认消息
             judgeService.doJudge(questionSubmitId, gameId);

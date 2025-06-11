@@ -1,10 +1,16 @@
 package com.xu.xuoj.model.dto.apply;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+
 @Data
-public class CreatorApplyJudgeRequest {
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreatorApplyJudgeRequest implements Serializable {
     @NotNull
     private Long id;
 

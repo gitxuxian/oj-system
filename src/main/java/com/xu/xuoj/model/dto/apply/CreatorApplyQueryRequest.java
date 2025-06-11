@@ -6,5 +6,4 @@ import lombok.Data;
 @Data
 public class CreatorApplyQueryRequest extends PageRequest {
     private Integer status;
-    private String username;
 }

@@ -105,11 +105,9 @@ public class GameRankServiceImpl extends ServiceImpl<GameRankMapper, GameRank>
         try {
             // 获取所有该比赛的排名记录
             List<GameRank> ranks = getGameRankList(gameId, null);
-            
             // 这里可以实现更复杂的排名计算逻辑
             // 比如根据得分、时间、内存等综合计算排名
             // 当前实现已经通过orderBy完成了基本排序
-            
             return true;
         } catch (Exception e) {
             log.error("计算排行榜失败", e);

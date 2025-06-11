@@ -94,12 +94,10 @@ public class CreatorApplicationServiceImpl extends ServiceImpl<CreatorApplicatio
         LambdaQueryWrapper<CreatorApplication> queryWrapper = new LambdaQueryWrapper<>();
 
         // 设置查询条件
-        if (request.getStatus() != null) {
+        if (request.getStatus() != null&&request.getStatus()==0) {
             queryWrapper.eq(CreatorApplication::getStatus, request.getStatus());
         }
-        if (StringUtils.isNotBlank(request.getUsername())) {
-            queryWrapper.like(CreatorApplication::getUsername, request.getUsername());
-        }
+
 
         // 按申请时间倒序
         queryWrapper.orderByDesc(CreatorApplication::getCreate_time);

@@ -168,7 +168,7 @@ public class QuestionController {
     @GetMapping("/get/vo")
     @SaIgnore
     @ApiOperation("根据ID查询题目")
-    public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
+    public BaseResponse<QuestionVO> getQuestionVOById(Long id, HttpServletRequest request) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }

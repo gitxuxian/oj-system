@@ -47,7 +47,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game>
     implements GameService {
 
     @Resource
-    private final GameMapper gameMapper;
+    private  GameMapper gameMapper;
 
     @Resource
     private QuestionSubmitService questionSubmitService;
@@ -55,9 +55,6 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game>
     @Resource
     private GameMessageProducer gameMessageProducer;
 
-    public GameServiceImpl(GameMapper gameMapper) {
-        this.gameMapper = gameMapper;
-    }
 
     @Override
     public List<Game> listGames(GameQueryDTO gameQueryDTO) {
@@ -67,7 +64,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game>
         }
         // 处理查询条件
         if (StringUtils.isNotBlank(gameQueryDTO.getGameName())) {
-            queryWrapper.like("game_name", gameQueryDTO.getGameName());
+            queryWrapper.like("gameName", gameQueryDTO.getGameName());
         }
         if (gameQueryDTO.getType() != null) {
             queryWrapper.eq("type", gameQueryDTO.getType());
@@ -75,14 +72,15 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game>
         if (gameQueryDTO.getStatus() != null) {
             queryWrapper.eq("status", gameQueryDTO.getStatus());
         }
-        if (gameQueryDTO.getGameDateStart() != null && gameQueryDTO.getGameDateEnd() != null) {
-            queryWrapper.between("game_date", gameQueryDTO.getGameDateStart(), gameQueryDTO.getGameDateEnd());
-        }
 
-        // 处理分页
-        if (gameQueryDTO.getPageSize() != 0 && gameQueryDTO.getCurrent() != 0) {
-            Page<Game> page = new Page<>(gameQueryDTO.getCurrent(), gameQueryDTO.getPageSize());
-            return this.page(page, queryWrapper).getRecords();
+        try {
+            // 处理分页
+            if (gameQueryDTO.getPageSize() != 0 && gameQueryDTO.getCurrent() != 0) {
+                Page<Game> page = new Page<>(gameQueryDTO.getCurrent(), gameQueryDTO.getPageSize());
+                return this.page(page, queryWrapper).getRecords();
+            }
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
         }
         return this.list(queryWrapper);
     }

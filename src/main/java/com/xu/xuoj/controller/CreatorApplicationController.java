@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/api/creator")
-@Api(tags = "申请者模块")
+@Api(tags = "出题者模块")
 @Slf4j
 public class CreatorApplicationController {
 
@@ -39,7 +39,6 @@ public class CreatorApplicationController {
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-
         Long userId = StpUtil.getLoginIdAsLong();
         long applicationId = creatorApplicationService.submitApplication(request, userId);
         return ResultUtils.success(applicationId);

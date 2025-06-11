@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/game")
 @Api(tags = "竞赛模块")
-
 public class GameController {
 
 
